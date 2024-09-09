@@ -1,0 +1,62 @@
+---
+title: "Basic Data Cleaning and Summary in R"
+output: html_document
+date: "2024-09-08"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+# Load required libraries
+library(dplyr)      # For data manipulation (filtering, grouping, summarizing)
+library(tidyr)      # For reshaping and tidying data
+library(lubridate)  # For working with dates easily
+library(stringr)    # For string manipulation (trimming, case conversion, etc.)
+```
+
+```{r}
+# Sample dataset: Sales data (Date, Product, Sales, Discount)
+data <- data.frame(
+  Date = c("2024-09-01", "2024-09-02", "2024-09-03", "2024-09-04"),  # Date column in string format
+  Product = c("A", "B", "A", "C"),  # Product names
+  Sales = c(100, 150, 200, 130),    # Sales amounts
+  Discount = c(0.10, 0.15, 0.05, 0.10)  # Discount percentages
+)
+```
+
+```{r}
+# Convert Date to Date format using lubridate's ymd() function
+data <- data %>%
+  mutate(Date = ymd(Date))  
+  # ymd() automatically parses "Year-Month-Day" strings into Date objects
+
+# Clean Product column (e.g., convert to uppercase, remove whitespace)
+data <- data %>%
+  mutate(Product = str_trim(str_to_upper(Product)))
+  # str_to_upper() converts strings to uppercase
+  # str_trim() removes leading and trailing spaces from the Product column
+```
+
+```{r}
+# Calculate total sales after discount
+data <- data %>%
+  mutate(Total_Sales = Sales * (1 - Discount))
+  # mutate() creates a new column 'Total_Sales' by applying a formula: Sales * (1 - Discount)
+
+# Summarize total sales by Product
+summary <- data %>%
+  group_by(Product) %>%  # group_by() organizes data by the Product column
+  summarise(Total_Sales = sum(Total_Sales))  
+  # summarise() computes the total sales for each product using sum()
+```
+
+```{r}
+# Output the results
+print("Cleaned Data:")  # Print cleaned dataset
+print(data)             # Display the modified dataset
+
+print("Sales Summary:") # Print sales summary by product
+print(summary)          # Display the summary dataset
+```
